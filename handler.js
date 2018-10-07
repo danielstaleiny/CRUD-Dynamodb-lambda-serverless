@@ -1,18 +1,15 @@
-import AWS from 'aws-sdk'
 import { done, fail } from './util/response'
 import * as App from './src/index'
 
-const db = new AWS.DynamoDB.DocumentClient()
-
 // handler :: (Promise, ?code) -> Promise
-const handler = (fn, code) => async (event, ctx, callback) => {
+const handler = (fn, code) => (event, ctx, callback) => {
     ctx.callbackWaitsForEmptyEventLoop = false
-    try {
-        await fn(event).then(json => callback(null, done(json, code)))
-    } catch (err) {
-        console.error(err)
-        callback(null, fail({ error: err }))
-    }
+    fn(event)
+        .then(json => callback(null, done(json, code)))
+        .catch(err => {
+            console.error(err)
+            callback(null, fail({ error: err }))
+        })
 }
 
 // create :: (Object, Object, Function) -> Promise
