@@ -1,0 +1,28 @@
+{
+  "name": "CRUD-Dynamo-lambada-serverless",
+  "version": "1.0.0",
+  "description": "CRUD of DynamoDB example in serverless deployed on lambda",
+  "main": "handler.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "D.R.",
+  "license": "MIT",
+  "devDependencies": {
+    "aws-sdk": "^2.329.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-plugin-source-map-support": "^1.0.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-stage-3": "^6.24.1",
+    "jest": "^21.2.1",
+    "serverless-offline": "^3.20.3",
+    "serverless-webpack": "^5.1.5",
+    "webpack": "^4.8.1",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "dependencies": {
+    "source-map-support": "^0.4.18"
+  }
+}
