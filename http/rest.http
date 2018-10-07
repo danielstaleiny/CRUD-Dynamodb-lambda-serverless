@@ -1,0 +1,44 @@
+# ---- LOCAL ENVIRONMENTS ---- #
+
+:http = http
+:host = 127.0.0.1:3000
+:api = :http://:host
+
+
+:header = <<
+twl-app-key: :appkey
+Content-Type: application/json
+#
+
+
+#CREATE
+POST :api/todos
+:header
+
+{
+  "text": "hello world databes way."
+}
+
+#LIST
+GET :api/todos
+:header
+
+#GET ONE
+:id = sErOxafd
+GET :api/todos/:id
+:header
+
+#UPDATE ONE
+:id = sErOxafd
+PUT :api/todos/:id
+:header
+
+{
+  "text": "It's even works.",
+  "checked": true
+}
+
+#DELETE ONE
+:id = sErOxafd
+DELETE :api/todos/:id
+:header

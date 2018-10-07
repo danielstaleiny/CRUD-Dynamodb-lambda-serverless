@@ -4,6 +4,7 @@ service: CRUD-dynamodb-lambda-serverless
 plugins:
   - serverless-webpack
   - serverless-offline
+  - serverless-dynamodb-local
 
 provider:
   name: aws
@@ -13,6 +14,17 @@ provider:
   environment: ${file(env.yml):${self:provider.stage}}
   memorySize: 128
   timeout: 10
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+
 
 # serverless-webpack configuration
 # Enable auto-packing of external modules
@@ -20,16 +32,70 @@ custom:
   webpack:
     webpackConfig: ./webpack.config.js
     includeModules: true
+  dynamodb:
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+    migration:
+      dir: offline/migrations
 
 package:
   individually: true
 
 
 functions:
+  create:
+    handler: handler.create
+    events:
+      - http:
+          path: todos
+          method: post
+          cors: true
+  list:
+    handler: handler.list
+    events:
+      - http:
+          path: todos
+          method: get
+          cors: true
   read:
     handler: handler.read
     events:
       - http:
+          path: todos/{id}
           method: get
-          path: read
           cors: true
+  update:
+    handler: handler.update
+    events:
+      - http:
+          path: todos/{id}
+          method: put
+          cors: true
+  delete:
+    handler: handler.remove
+    events:
+      - http:
+          path: todos/{id}
+          method: delete
+          cors: true
+
+resources:
+  Resources:
+    TodosDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
