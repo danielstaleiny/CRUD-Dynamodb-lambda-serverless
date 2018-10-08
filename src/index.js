@@ -28,7 +28,7 @@ export const createnew = async event => {
     const timestamp = new Date().getTime()
     const body = parseBody(event)
 
-    const newItem = {
+    let newItem = {
         id: genId(),
         text: body.text,
         checked: false,
@@ -38,11 +38,34 @@ export const createnew = async event => {
 
     const params = {
         TableName: process.env.DYNAMODB_TABLE,
-        Item: newItem
+        Item: newItem,
+        Expected: {
+            // makes sure we don't overrwrite existing id
+            id: {
+                Exists: false
+            }
+        }
     }
     return await db
         .put(params)
         .promise()
+        .catch(err => {
+            // check for key already exists error
+            // retry on key already exists
+            if (err.code === 'ConditionalCheckFailedException') {
+                newItem = {
+                    ...newItem,
+                    id: generate(CHARS, 8)
+                }
+                const paramsWithNewId = {
+                    ...params,
+                    Item: newItem // overrwrite old Item
+                }
+                return db.put(paramsWithNewId) // return promise to return into then process
+            } else {
+                throw err
+            } // rethrow to catch it later
+        })
         .then(_ => newItem)
 }
 

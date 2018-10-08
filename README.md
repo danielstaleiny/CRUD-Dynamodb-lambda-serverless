@@ -1,5 +1,5 @@
 # CRUD-Dynamodb-lambda-serverless
-Crud example of performing simple dynamodb lambda serverless offline. 
+Crud example of simple dynamodb lambda serverless-offline. 
 
 ## Setup
 
